@@ -1,12 +1,22 @@
-FROM debian:stable-slim
+FROM alpine:latest
 
-RUN apt-get update && \
-    apt-get upgrade -y
-RUN apt-get install -y build-essential vim subversion automake autoconf libxml2-dev mosquitto-clients git cmake jq iputils-ping 
-RUN mkdir openv && cd openv && git clone https://github.com/openv/vcontrold.git vcontrold-code
-RUN cd /openv && cmake ./vcontrold-code -DVSIM=ON -DMANPAGES=OFF && \
-    make && \
-    make install
+RUN apk update && apk add --no-cache libxml2-dev linux-headers git build-base gcc abuild binutils binutils-doc gcc-doc cmake cmake-doc extra-cmake-modules extra-cmake-modules-doc
+
+RUN mkdir openv && \
+    cd openv && \
+    git clone https://github.com/openv/vcontrold.git && \
+    cd vcontrold && \
+    rm -rf build && \
+    cmake . -DMANPAGES=OFF -DCMAKE_BUILD_TYPE=Release -Bbuild && \
+    cmake --build build
+
+FROM alpine:latest
+WORKDIR /root/
+
+COPY --from=0 /openv/vcontrold/build/vcontrold /usr/local/sbin/
+COPY --from=0 /openv/vcontrold/build/vclient /usr/local/bin/
+COPY --from=0 /usr/lib/libxml2.so* /usr/lib/
+COPY --from=0 /usr/lib/liblzma.so* /usr/lib/
 
 ADD config /etc/vcontrold/
 ADD startup.sh /
