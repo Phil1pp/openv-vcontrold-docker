@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION=2.3
+VERSION=0.98.12
 
 docker build -t phil1pp/vcontrold:$VERSION .
 docker push phil1pp/vcontrold:$VERSION
