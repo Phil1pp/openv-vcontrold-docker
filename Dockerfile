@@ -2,6 +2,8 @@ FROM alpine:latest
 
 RUN apk update && apk add --no-cache libxml2-dev linux-headers git build-base gcc abuild binutils binutils-doc gcc-doc cmake cmake-doc extra-cmake-modules extra-cmake-modules-doc
 
+ADD https://api.github.com/repos/openv/vcontrold/git/refs/heads/master version.json
+
 RUN mkdir openv && \
     cd openv && \
     git clone https://github.com/openv/vcontrold.git && \
